@@ -1,25 +1,16 @@
 'use strict'
-const Horario = use('App/Models/Horario');
-const { validate } = use('Validator');
 
-const rules = {
-  nombre: 'required',
-  apellidoPaterno: 'required',
-  apellidoMaterno: 'required',
-  matricula: 'required',
-  rfid: 'required'
-};
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
 /**
- * Resourceful controller for interacting with horarios
+ * Resourceful controller for interacting with asistencias
  */
-class HorarioController {
+class AsistenciaController {
   /**
-   * Show a list of all horarios.
-   * GET horarios
+   * Show a list of all asistencias.
+   * GET asistencias
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -27,13 +18,11 @@ class HorarioController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
-    let horario = await Horario.all()
-    return response.status(200).json(horario)
   }
 
   /**
-   * Render a form to be used for creating a new horario.
-   * GET horarios/create
+   * Render a form to be used for creating a new asistencia.
+   * GET asistencias/create
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -44,21 +33,19 @@ class HorarioController {
   }
 
   /**
-   * Create/save a new horario.
-   * POST horarios
+   * Create/save a new asistencia.
+   * POST asistencias
    *
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
   async store ({ request, response }) {
-    let horario = await Horario.create(request.all())
-    return response.created(horario)
   }
 
   /**
-   * Display a single horario.
-   * GET horarios/:id
+   * Display a single asistencia.
+   * GET asistencias/:id
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -66,14 +53,11 @@ class HorarioController {
    * @param {View} ctx.view
    */
   async show ({ params, request, response, view }) {
-    let {id} = params
-    let horario = await Horario.findOrFail(id)
-    return response.cookie(horario)
   }
 
   /**
-   * Render a form to update an existing horario.
-   * GET horarios/:id/edit
+   * Render a form to update an existing asistencia.
+   * GET asistencias/:id/edit
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -84,39 +68,26 @@ class HorarioController {
   }
 
   /**
-   * Update horario details.
-   * PUT or PATCH horarios/:id
+   * Update asistencia details.
+   * PUT or PATCH asistencias/:id
    *
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
   async update ({ params, request, response }) {
-    let {id} = params
-    let horario = await Horario.findOrFail(id)
-
-    horario.merge(request.all())
-    await horario.save()
-    return response.status(200).json(horario)
   }
 
   /**
-   * Delete a horario with id.
-   * DELETE horarios/:id
+   * Delete a asistencia with id.
+   * DELETE asistencias/:id
    *
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
   async destroy ({ params, request, response }) {
-    let {id} = params
-    let horario = await Horario.find(id)
-    if (!horario) {
-      return response.status(404).json({data: 'Resource not found'})
-    }
-    await horario.delete()
-    return response.status(200).json(null)
   }
 }
 
-module.exports = HorarioController
+module.exports = AsistenciaController

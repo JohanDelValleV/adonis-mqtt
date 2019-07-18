@@ -16,11 +16,9 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.get('/', () => {
-  return { greeting: 'Hello world in JSON' }
-})
-
 Route.resource('alumnos', 'AlumnoController')
 Route.resource('profesores', 'ProfesorController')
 Route.resource('asignaturas', 'AsignaturaController')
 Route.resource('horarios', 'HorarioController')
+Route.resource('asistencia', 'AsistenciaController')
+

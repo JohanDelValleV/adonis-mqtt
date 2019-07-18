@@ -8,7 +8,6 @@ class AlumnoSchema extends Schema {
     this.create('alumnos', (table) => {
       table.increments()
       table.string('nombre')
-      // table.integer('id_asignatura').unsigned().references('id').inTable('asignaturas')
       table.string('apellidoPaterno')
       table.string('apellidoMaterno')
       table.integer('matricula')
