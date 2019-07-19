@@ -1,5 +1,6 @@
 'use strict'
 const Alumno = use('App/Models/Alumno');
+const AlumnoAsignatura = use('App/Models/AlumnoAsignatura');
 const { validate } = use('Validator');
 
 const rules = {
@@ -28,7 +29,8 @@ class AlumnoController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
-    let alumno = await Alumno.all()
+    // let alumno = await Alumno.all()
+    let alumno = await AlumnoAsignatura.query().has('asignaturas').fetch()
     return response.status(200).json(alumno)
   }
 

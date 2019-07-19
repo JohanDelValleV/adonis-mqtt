@@ -7,11 +7,11 @@ class AlumnoSchema extends Schema {
   up () {
     this.create('alumnos', (table) => {
       table.increments()
-      table.string('nombre')
-      table.string('apellidoPaterno')
-      table.string('apellidoMaterno')
-      table.integer('matricula')
-      table.integer('rfid')
+      table.string('nombre').notNullable();
+      table.string('apellidoPaterno').notNullable();
+      table.string('apellidoMaterno').notNullable();
+      table.integer('matricula').notNullable();
+      table.integer('rfid').notNullable();
       table.timestamps()
     })
   }

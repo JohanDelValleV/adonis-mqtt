@@ -7,11 +7,11 @@ class HorarioSchema extends Schema {
   up () {
     this.create('horarios', (table) => {
       table.increments()
-      table.string('lunes')
-      table.string('martes')
-      table.string('miercoles')
-      table.string('jueves')
-      table.string('viernes')
+      table.string('lunes').notNullable();
+      table.string('martes').notNullable();
+      table.string('miercoles').notNullable();
+      table.string('jueves').notNullable();
+      table.string('viernes').notNullable();
       table.timestamps()
     })
   }

@@ -4,8 +4,12 @@
 const Model = use('Model')
 
 class Alumno extends Model {
-    asignaturas() {
-        return this.manyThrough('App/Models/Asignatura', 'asignaturas')
+    asignatura() {
+        return this.manyThrough('App/Models/AlumnoAsignatura', 'asignaturas')
+    }
+
+    alumno() {
+        return this.manyThrough('App/Models/AlumnoAsignatura', 'alumnos')
     }
 }
 

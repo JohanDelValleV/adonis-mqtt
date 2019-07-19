@@ -4,6 +4,9 @@
 const Model = use('Model')
 
 class Profesor extends Model {
+    asignatura() {
+        return this.hasOne('App/Models/Asignatura')
+    }
 }
 
 module.exports = Profesor

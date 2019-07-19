@@ -7,9 +7,9 @@ class HoraSchema extends Schema {
   up () {
     this.create('horas', (table) => {
       table.increments()
-      table.integer('id_horario').unsigned().references('id').inTable('horarios')
-      table.time('hora_inicio')
-      table.time('hora_fin')
+      table.integer('id_horario').unsigned().references('id').inTable('horarios').notNullable();
+      table.time('hora_inicio').notNullable();
+      table.time('hora_fin').notNullable();
       table.timestamps()
     })
   }

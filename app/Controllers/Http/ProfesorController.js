@@ -1,5 +1,6 @@
 'use strict'
 const Profesor = use('App/Models/Profesor');
+const Asignatura = use('App/Models/Asignatura');
 const { validate } = use('Validator');
 const rules = {
   nombre: 'required',
