@@ -8,12 +8,8 @@ class Asignatura extends Model {
         return this.hasOne('App/Models/Profesor')
     }
 
-    asignatura() {
-        return this.manyThrough('App/Models/AlumnoAsignatura').pivotTable('alumno_asignaturas')
-    }
-
-    alumno() {
-        return this.manyThrough('App/Models/AlumnoAsignatura', 'alumnos')
+    alumnos() {
+        return this.belongsToMany('App/Models/Alumno')
     }
 }
 

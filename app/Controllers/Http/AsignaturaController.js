@@ -69,13 +69,8 @@ class AsignaturaController {
    */
   async show ({ params, request, response, view }) {
     let {id} = params
-    let asignatura = await Asignatura.findOrFail(id)
-    // let profesor = await Profesor.findBy('asignatura_id', id)
-    // console.log(profesor.toJSON()['asigatura_id'])
-    let asignatura2 = await Asignatura.query().with('profesor').where('id', '=', id).fetch()
-    // console.log(asignatura2.toJSON());
-    
-    return response.ok(asignatura2)
+    let asignatura = await Asignatura.query().with('profesor').where('id', '=', id).fetch()
+    return response.ok(asignatura)
   }
 
   /**
