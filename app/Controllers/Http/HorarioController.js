@@ -27,7 +27,10 @@ class HorarioController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
-    let horario = await Horario.all()
+    let horario = await Horario.query().with('asignaturas').fetch()
+    if (horario.rows == 0) {
+      return response.status(404).json({data: 'No resource found'})
+    }
     return response.status(200).json(horario)
   }
 

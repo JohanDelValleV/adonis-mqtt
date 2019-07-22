@@ -1,6 +1,6 @@
 'use strict'
 const Asignatura = use('App/Models/Asignatura');
-const Profesor = use('App/Models/Profesor');
+const Horario = use('App/Models/Horario');
 const { validate } = use('Validator');
 const rules = {
   nombre: 'required'
@@ -24,7 +24,8 @@ class AsignaturaController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
-    let asignatura = await Asignatura.query().with('profesor').fetch()
+    let asignatura = await Asignatura.query().with('profesor').with('horarios').fetch()
+    
     return response.status(200).json(asignatura)    
   }
 
@@ -53,8 +54,15 @@ class AsignaturaController {
     if (validation.fails()) {
       return validation.messages()
     } else {
-      let asignatura = await Asignatura.create(request.all())
-      return response.created(asignatura)
+      let {horarios, ...data} = await request.all(['horarios'])
+
+      let asignatura = await Asignatura.create(data)
+
+      if (horarios && horarios.length > 0) {
+        await asignatura.horarios().attach(horarios)
+        await asignatura.load('horarios')
+      }
+      return response.ok(asignatura)
     }
   }
 

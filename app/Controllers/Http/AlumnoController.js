@@ -28,7 +28,8 @@ class AlumnoController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
-    let alumno = await Alumno.query().with('asignaturas').fetch()
+    let alumno = await Alumno.query().with('asignaturas.profesor').fetch()
+    
     return response.status(200).json(alumno)
   }
 
@@ -56,17 +57,17 @@ class AlumnoController {
     const validation = await validate(request.all(), rules)
     if (validation.fails()) {
       return validation.messages()
-    } else {
-      let {asignaturas, ...data} = request.all(['asignaturas'])
-      
-      let alumno = await Alumno.create(data)
-
-      if (asignaturas && asignaturas.length > 0) {
-        await alumno.asignaturas().attach(asignaturas)
-        await alumno.load('asignaturas')
-      }
-      return alumno
     }
+    let {asignaturas, ...data} = request.all(['asignaturas'])
+    
+    let alumno = await Alumno.create(data)
+
+    if (asignaturas && asignaturas.length > 0) {
+      await alumno.asignaturas().attach(asignaturas)
+      await alumno.load('asignaturas')
+    }
+    return response.ok(alumno)
+    
   }
 
   /**
@@ -80,7 +81,7 @@ class AlumnoController {
    */
   async show ({ params, request, response, view }) {
     let {id} = params
-    let alumno = await Alumno.query().with('asignaturas').where('id', '=', id).fetch()
+    let alumno = await Alumno.query().with('asignaturas.profesor').where('id', '=', id).fetch()
     return response.ok(alumno)
   }
 
@@ -110,17 +111,16 @@ class AlumnoController {
     const validation = await validate(request.all(), rules)
     if (validation.fails()) {
       return validation.messages()
-    }else {
-      alumno.merge(data)
-      await alumno.save()
-
-      if (asignaturas && asignaturas.length > 0) {
-        await alumno.asignaturas().sync(asignaturas)
-        await alumno.load('asignaturas')
-      }
-
-      return response.status(200).json(alumno)
     }
+    alumno.merge(data)
+    await alumno.save()
+
+    if (asignaturas && asignaturas.length > 0) {
+      await alumno.asignaturas().sync(asignaturas)
+      await alumno.load('asignaturas')
+    }
+
+    return response.status(200).json(alumno)
   }
 
   /**
