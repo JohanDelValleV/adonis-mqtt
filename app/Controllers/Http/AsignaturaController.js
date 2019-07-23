@@ -25,7 +25,6 @@ class AsignaturaController {
    */
   async index ({ request, response, view }) {
     let asignatura = await Asignatura.query().with('profesor').with('horarios').fetch()
-    
     return response.status(200).json(asignatura)    
   }
 
@@ -77,7 +76,10 @@ class AsignaturaController {
    */
   async show ({ params, request, response, view }) {
     let {id} = params
-    let asignatura = await Asignatura.query().with('profesor').where('id', '=', id).fetch()
+    let asignatura = await Asignatura.query().with('profesor').with('horarios').where('id', '=', id).fetch()
+    if (asignatura.rows == 0) {
+      return response.status(404).json({data: 'Resource not found'})
+    }
     return response.ok(asignatura)
   }
 
@@ -102,16 +104,21 @@ class AsignaturaController {
    * @param {Response} ctx.response
    */
   async update ({ params, request, response }) {
-    let {id} = params
-    let asignatura = await Asignatura.findOrFail(id)
+    let asignatura = await Asignatura.findOrFail(params.id)
+    let {horarios, ...data} = request.all(['horarios'])
     const validation = await validate(request.all(), rules)
     if (validation.fails()) {
       return validation.messages()
-    }else {
-      asignatura.merge(request.all())
-      await asignatura.save()
-      return response.status(200).json(asignatura)
     }
+    asignatura.merge(data)
+    await asignatura.save()
+
+    if (horarios && horarios.length > 0) {
+      await asignatura.horarios().sync(horarios)
+      await asignatura.load('horarios')
+    }
+
+      return response.status(200).json(asignatura)
   }
 
   /**
@@ -129,7 +136,7 @@ class AsignaturaController {
       return response.status(404).json({data: 'Resource not found'})
     }
     await asignatura.delete()
-    return response.status(200).json(null)
+    return response.status(200).json({data: 'Elemento eliminado'})
   }
 }
 

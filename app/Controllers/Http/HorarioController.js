@@ -69,9 +69,15 @@ class HorarioController {
    * @param {View} ctx.view
    */
   async show ({ params, request, response, view }) {
-    let {id} = params
-    let horario = await Horario.findOrFail(id)
-    return response.cookie(horario)
+    try {
+      let {id} = params
+      let horario = await Horario.findOrFail(id)
+      return response.ok(horario)
+    } catch (error) {
+      return response.status(404).json({data: 'Resource not found'})
+    }
+    
+    
   }
 
   /**

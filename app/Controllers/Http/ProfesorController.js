@@ -71,9 +71,14 @@ class ProfesorController {
    * @param {View} ctx.view
    */
   async show ({ params, request, response, view }) {
-    let {id} = params
-    let profesor = await Profesor.findOrFail(id)
-    return response.ok(profesor)
+    try {
+      let {id} = params
+      let profesor = await Profesor.findOrFail(id)
+      return response.ok(profesor) 
+    }catch {
+      return response.status(404).json({data: 'Resource not found'})
+    }
+
   }
 
   /**

@@ -28,7 +28,7 @@ class AlumnoController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
-    let alumno = await Alumno.query().with('asignaturas.profesor').fetch()
+    let alumno = await Alumno.query().with('asignaturas.horarios').with('asignaturas.profesor').fetch()
     
     return response.status(200).json(alumno)
   }
@@ -81,7 +81,10 @@ class AlumnoController {
    */
   async show ({ params, request, response, view }) {
     let {id} = params
-    let alumno = await Alumno.query().with('asignaturas.profesor').where('id', '=', id).fetch()
+    let alumno = await Alumno.query().with('asignaturas.horarios').with('asignaturas.profesor').where('id', '=', id).fetch()
+    if (alumno.rows == 0) {
+      return response.status(404).json({data: 'Resource not found'})
+    }
     return response.ok(alumno)
   }
 
@@ -117,9 +120,9 @@ class AlumnoController {
 
     if (asignaturas && asignaturas.length > 0) {
       await alumno.asignaturas().sync(asignaturas)
-      await alumno.load('asignaturas')
+      await alumno.loadMany(['asignaturas.horarios', 'asignaturas.profesor'])
     }
-
+    
     return response.status(200).json(alumno)
   }
 
