@@ -1,9 +1,9 @@
 'use strict'
 const Asignatura = use('App/Models/Asignatura');
-const Horario = use('App/Models/Horario');
 const { validate } = use('Validator');
 const rules = {
-  nombre: 'required'
+  nombre: 'required',
+  slug: 'required'
 };
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
@@ -52,17 +52,16 @@ class AsignaturaController {
     const validation = await validate(request.all(), rules)
     if (validation.fails()) {
       return validation.messages()
-    } else {
-      let {horarios, ...data} = await request.all(['horarios'])
-
-      let asignatura = await Asignatura.create(data)
-
-      if (horarios && horarios.length > 0) {
-        await asignatura.horarios().attach(horarios)
-        await asignatura.load('horarios')
-      }
-      return response.ok(asignatura)
     }
+
+    let {horarios, ...data} = await request.all(['horarios'])
+    let asignatura = await Asignatura.create(data)
+
+    if (horarios && horarios.length > 0) {
+      await asignatura.horarios().attach(horarios)
+      await asignatura.load('horarios')
+    }
+    return response.ok(asignatura)
   }
 
   /**

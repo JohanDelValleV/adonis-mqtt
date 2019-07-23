@@ -55,10 +55,10 @@ class ProfesorController {
     const validation = await validate(request.all(), rules)
     if (validation.fails()) {
       return validation.messages()
-    } else {
-      let profesor = await Profesor.create(request.all())
-      return response.created(profesor)
     }
+    
+    let profesor = await Profesor.create(request.all())
+    return response.created(profesor)
   }
 
   /**

@@ -3,11 +3,9 @@ const Horario = use('App/Models/Horario');
 const { validate } = use('Validator');
 
 const rules = {
-  nombre: 'required',
-  apellidoPaterno: 'required',
-  apellidoMaterno: 'required',
-  matricula: 'required',
-  rfid: 'required'
+  dia: 'required',
+  hora_inicio: 'required',
+  hora_fin: 'required',
 };
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -55,7 +53,10 @@ class HorarioController {
    * @param {Response} ctx.response
    */
   async store ({ request, response }) {
-    let horario = await Horario.create(request.all())
+    let horario = await Horario.create(request.all(), rules)
+    if (validation.fails()) {
+      return validation.messages()
+    }
     return response.created(horario)
   }
 
@@ -101,8 +102,12 @@ class HorarioController {
    * @param {Response} ctx.response
    */
   async update ({ params, request, response }) {
-    let {id} = params
-    let horario = await Horario.findOrFail(id)
+    let horario = await Horario.findOrFail(params.id)
+    const validation = await validate(request.all(), rules)
+    
+    if (validation.fails()) {
+      return validation.messages()
+    }
 
     horario.merge(request.all())
     await horario.save()
