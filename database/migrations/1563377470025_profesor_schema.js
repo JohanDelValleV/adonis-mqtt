@@ -10,7 +10,7 @@ class ProfesorSchema extends Schema {
       table.string('nombre').notNullable();
       table.string('apellidoPaterno').notNullable();
       table.string('apellidoMaterno').notNullable();
-      table.integer('matricula').notNullable();
+      table.integer('matricula').notNullable().unique();
       table.integer('asignatura_id').unsigned().references('id').inTable('asignaturas').notNullable().unique().onDelete('cascade');
       table.timestamps()
     })
