@@ -1,5 +1,12 @@
 'use strict'
 const Asignatura = use('App/Models/Asignatura');
+const Horario = use('App/Models/Horario');
+const rules2 = {
+  dia: 'required',
+  hora_inicio: 'required',
+  hora_fin: 'required',
+};
+
 const { validate } = use('Validator');
 const rules = {
   nombre: 'required',
@@ -54,7 +61,21 @@ class AsignaturaController {
       return validation.messages()
     }
 
-    let {horarios, ...data} = await request.all(['horarios'])
+    let arrayHorarios = await request.all()['horarios'];
+    let idsHorario = []
+    arrayHorarios.forEach(async element => {
+      let as = await Horario.create(element)
+      idsHorario.push(as.id)
+    });
+
+    let form={
+      nombre:request.all()['nombre'],
+      slug:request.all()['slug'],
+      horarios:idsHorario
+    }
+
+
+    let {horarios, ...data} = await form
     let asignatura = await Asignatura.create(data)
 
     if (horarios && horarios.length > 0) {
