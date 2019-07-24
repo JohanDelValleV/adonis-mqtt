@@ -53,10 +53,11 @@ class HorarioController {
    * @param {Response} ctx.response
    */
   async store ({ request, response }) {
-    let horario = await Horario.create(request.all(), rules)
+    const validation = await validate(request.all(), rules)
     if (validation.fails()) {
       return validation.messages()
     }
+    let horario = await Horario.create(request.all(), rules)
     return response.created(horario)
   }
 
