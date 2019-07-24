@@ -2,6 +2,8 @@
 const Asistencia = use('App/Models/Asistencia');
 const Alumno = use('App/Models/Alumno');
 const { validate } = use('Validator');
+const io = require('socket.io-client');
+const socket = io('http://localhost:3000')
 const rules = {
   rfid: 'required',
   
@@ -73,6 +75,7 @@ class AsistenciaController {
           let asistencia = await Asistencia.create(request.all())
           return response.created(asistencia)            
         }else{          
+          socket.emit('rfid',rfids)
           return response.status(404).json({data: 'rfid not exist'})
           }
       }
