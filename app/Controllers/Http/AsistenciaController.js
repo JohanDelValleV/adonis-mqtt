@@ -1,8 +1,16 @@
 'use strict'
+const Asistencia = use('App/Models/Asistencia');
+const Alumno = use('App/Models/Alumno');
+const { validate } = use('Validator');
+const rules = {
+  rfid: 'required',
+  
+};
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
+
 
 /**
  * Resourceful controller for interacting with asistencias
@@ -18,6 +26,8 @@ class AsistenciaController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
+    let asistencia = await Asistencia.all()
+    return response.status(200).json(asistencia)
   }
 
   /**
@@ -41,7 +51,34 @@ class AsistenciaController {
    * @param {Response} ctx.response
    */
   async store ({ request, response }) {
-  }
+    
+      const validation = await validate(request.all(), rules)
+      const rfids = request._body.rfid
+      
+      let now= new Date();
+      const dia = now.getDate();
+      const mes = now.getMonth()+1;
+      const anio = now.getFullYear();
+      const fecha_actual = anio +'-' + mes +'-' +dia;      
+               
+      if (!validation.fails()){
+        let alumno = await Alumno.query(). where('rfid', '=', rfids).fetch()
+        console.log(alumno); 
+        if(alumno.rows != 0){
+          let diaAsistencia = await Asistencia.query().where('fecha', '=', fecha_actual).andWhere('rfid', rfids).fetch()
+//          console.log(diaAsistencia); 
+          if(diaAsistencia.rows != 0){
+            return response.json({data: 'ya se registro por el dia de hoy'})
+          }
+          let asistencia = await Asistencia.create(request.all())
+          return response.created(asistencia)            
+        }else{          
+          return response.status(404).json({data: 'rfid not exist'})
+          }
+      }
+      return validation.messages()       
+      
+  }  
 
   /**
    * Display a single asistencia.
@@ -53,8 +90,23 @@ class AsistenciaController {
    * @param {View} ctx.view
    */
   async show ({ params, request, response, view }) {
+    try {
+      let {id} = params
+      let asistencia = await Asistencia.findOrFail(id)
+      return response.ok(asistencia)
+    } catch (error) {
+      return response.status(404).json({data: 'Resource not found'})
+    }
   }
 
+  async obtener ({ params, request, response, view }) {    
+      let {rfid} = params
+      let asistencia = await Asistencia.query().where('rfid', '=', rfid).fetch()
+      if(asistencia.rows == 0){
+        return response.status(404).json({data: 'Resource not found'})      
+      }
+      return response.ok(asistencia)        
+  }
   /**
    * Render a form to update an existing asistencia.
    * GET asistencias/:id/edit

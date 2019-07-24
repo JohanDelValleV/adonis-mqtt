@@ -20,5 +20,6 @@ Route.resource('alumnos', 'AlumnoController')
 Route.resource('profesores', 'ProfesorController')
 Route.resource('asignaturas', 'AsignaturaController')
 Route.resource('horarios', 'HorarioController')
-Route.resource('asistencia', 'AsistenciaController')
+Route.resource('asistencias', 'AsistenciaController')
+Route.get('rfidObtener/:rfid', 'AsistenciaController.obtener').as('Asistencia.obtener')
 
