@@ -52,9 +52,9 @@ module.exports = {
     client: 'mysql',
     connection: {
       host: Env.get('DB_HOST', 'localhost'),
-      port: Env.get('DB_PORT', ''),
+      port: Env.get('DB_PORT', '3306'),
       user: Env.get('DB_USER', 'root'),
-      password: Env.get('DB_PASSWORD', ''),
+      password: Env.get('DB_PASSWORD', 'monopoli'),
       database: Env.get('DB_DATABASE', 'adonis')
     },
     debug: Env.get('DB_DEBUG', false)
@@ -74,9 +74,9 @@ module.exports = {
     client: 'pg',
     connection: {
       host: Env.get('DB_HOST', 'localhost'),
-      port: Env.get('DB_PORT', ''),
-      user: Env.get('DB_USER', 'root'),
-      password: Env.get('DB_PASSWORD', ''),
+      port: Env.get('DB_PORT', '5432'),
+      user: Env.get('DB_USER', 'postgres'),
+      password: Env.get('DB_PASSWORD', 'monopoli'),
       database: Env.get('DB_DATABASE', 'adonis')
     },
     debug: Env.get('DB_DEBUG', false)

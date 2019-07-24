@@ -10,8 +10,8 @@ class AlumnoSchema extends Schema {
       table.string('nombre').notNullable();
       table.string('apellidoPaterno').notNullable();
       table.string('apellidoMaterno').notNullable();
-      table.integer('matricula').notNullable();
-      table.integer('rfid').notNullable();
+      table.integer('matricula').notNullable().unique();
+      table.integer('rfid').notNullable().unique();
       table.timestamps()
     })
   }
