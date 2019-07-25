@@ -4,6 +4,9 @@
 const Model = use('Model')
 
 class Asistencia extends Model {
+    alumno(){
+        return this.belongsTo('App/Models/Alumno')
+    }
 }
 
 module.exports = Asistencia

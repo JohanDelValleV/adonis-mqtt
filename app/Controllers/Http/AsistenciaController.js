@@ -1,6 +1,7 @@
 'use strict'
 const Asistencia = use('App/Models/Asistencia');
 const Alumno = use('App/Models/Alumno');
+const Asignatura = use('App/Models/Alumno')
 const { validate } = use('Validator');
 const rules = {
   rfid: 'required',
@@ -50,28 +51,34 @@ class AsistenciaController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
-    
+  async store ({ request, response }) {      
       const validation = await validate(request.all(), rules)
       const rfids = request._body.rfid
-      
-      let now= new Date();
-      const dia = now.getDate();
-      const mes = now.getMonth()+1;
-      const anio = now.getFullYear();
-      const fecha_actual = anio +'-' + mes +'-' +dia;      
-               
+      //me  la pelas :v
+      const moment = require('moment')      
+      let currentDate = moment().format('YYYY-MM-DD')
+      let currentTime = moment().format('hh:mm:ss')            
       if (!validation.fails()){
-        let alumno = await Alumno.query(). where('rfid', '=', rfids).fetch()
-        console.log(alumno); 
+        let alumno = await Alumno.query(). where('rfid', '=', rfids).fetch()         
+        const b =  JSON.parse(JSON.stringify(alumno));         
+        //let asignatura = Asignatura.query().with('horario').where('horaio.dia', '=', 'lunes').andWhere();
         if(alumno.rows != 0){
-          let diaAsistencia = await Asistencia.query().where('fecha', '=', fecha_actual).andWhere('rfid', rfids).fetch()
-//          console.log(diaAsistencia); 
+          let diaAsistencia = await Asistencia.query().where('fecha', '=', currentDate).andWhere('rfid', rfids).fetch()
           if(diaAsistencia.rows != 0){
             return response.json({data: 'ya se registro por el dia de hoy'})
           }
-          let asistencia = await Asistencia.create(request.all())
-          return response.created(asistencia)            
+          const asistencia = new Asistencia()
+          asistencia.rfid = rfids
+          asistencia.matricula = b[0].matricula
+          asistencia.alumno_id = b[0].id   
+          asistencia.hora = currentTime
+          asistencia.fecha = currentDate
+          asistencia.asignatura = 
+          await asistencia.save()
+          return response.status(201).json(asistencia)                          
+          
+          // let asistencia = await Asistencia.create(request.all())
+          // return response.created(asistencia)            
         }else{          
           return response.status(404).json({data: 'rfid not exist'})
           }

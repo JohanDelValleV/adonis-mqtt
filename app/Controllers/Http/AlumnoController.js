@@ -1,8 +1,8 @@
 'use strict'
 const Alumno = use('App/Models/Alumno');
 const { validate } = use('Validator');
-const io = require('socket.io-client');
-const socket = io('http://localhost:3000')
+// const io = require('socket.io-client');
+// const socket = io('http://localhost:3000')
 const rules = {
   nombre: 'required',
   apellidoPaterno: 'required',

@@ -4,18 +4,17 @@
 const Schema = use('Schema')
 
 class AsistenciaSchema extends Schema {
-  up () {
-      let now= new Date();
-      const dia = now.getDate();
-      const mes = now.getMonth()+1;
-      const anio = now.getFullYear();
-      const fecha_actual = anio +'-' + mes +'-' +dia;
-
+  up () {               
     this.create('asistencias', (table) => {
       table.increments()
-      //table.integer('alumno_id').unsigned().references('id').inTable('alumnos').notNullable();
+      table.integer('alumno_id').unsigned().references('id').inTable('alumnos').notNullable().onDelete('cascade');
+      //                        .unsigned().references('id').inTable('asignaturas').notNullable().unique().onDelete('cascade');
       table.integer('rfid')      
-      table.date('fecha').defaultTo(fecha_actual)
+      table.integer('matricula')
+      table.string('asignatura')
+      table.date('fecha')
+      table.time('hora')
+
       table.timestamps()
     })
   }
