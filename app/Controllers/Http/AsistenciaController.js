@@ -6,7 +6,6 @@ const io = require('socket.io-client');
 const socket = io('http://localhost:3000')
 const rules = {
   rfid: 'required',
-  
 };
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
@@ -73,6 +72,7 @@ class AsistenciaController {
             return response.json({data: 'ya se registro por el dia de hoy'})
           }
           let asistencia = await Asistencia.create(request.all())
+          socket.emit('asistencia', 'ok')
           return response.created(asistencia)            
         }else{          
           socket.emit('rfid',rfids)
