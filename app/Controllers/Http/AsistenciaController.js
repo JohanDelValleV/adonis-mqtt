@@ -61,27 +61,71 @@ class AsistenciaController {
       if (!validation.fails()){
         let alumno = await Alumno.query(). where('rfid', '=', rfids).with('asignaturas').fetch()         
         const b =  JSON.parse(JSON.stringify(alumno));
-        let asignatura = b[0].asignaturas[0].nombre
+        
+        var respuesta
+        
         if(alumno.rows != 0){
-          let diaAsistencia = await Asistencia.query().where('fecha', '=', currentDate).andWhere('rfid', rfids).fetch()
-          if(diaAsistencia.rows != 0){
-            return response.json({data: 'ya se registro por el dia de hoy'})
-          }
-          const asistencia = new Asistencia()
-          asistencia.rfid = rfids
-          asistencia.matricula = b[0].matricula
-          asistencia.alumno_id = b[0].id   
-          asistencia.hora = currentTime
-          asistencia.fecha = currentDate
-          asistencia.asignatura = asignatura
-          await asistencia.save()
-          return response.status(201).json(asistencia)                          
+          let date = new Date()
+          let today = date.getDay()
+          let nombreToday = ''
+          let alumno2 = await Alumno.query().with('asignaturas.horarios').with('asignaturas.profesor').where('id', '=', b[0].id).fetch()
+          let alumnoJSON = JSON.parse(JSON.stringify(alumno2))
+          alumnoJSON[0].asignaturas.forEach(async asignatura => {
+            var nombreAsignatura = asignatura.nombre
+            asignatura.horarios.forEach(async horario=>{
+              switch (today) {
+                case 1:
+                    nombreToday='Lunes'
+                break;
+                case 2:
+                    nombreToday='Martes'
+                break;
+                case 3:
+                    nombreToday='Miercoles'
+                break;
+                case 4:
+                    nombreToday='Jueves'
+                break;
+                case 5:
+                    nombreToday='Viernes'
+                break;
+                default:
+                  break;
+              }
+              if(horario.dia==nombreToday){
+                let inicio = parseInt(horario.hora_inicio.substring(0, 2))
+                let final = parseInt(horario.hora_fin.substring(0, 2))
+                let horaActual = date.getHours()
+                if(horaActual>=inicio && horaActual<final-1){
+                  let diaAsistencia = await Asistencia.query().where('fecha', '=', currentDate).andWhere('rfid', rfids).andWhere('asignatura', nombreAsignatura).fetch()
+                  if(diaAsistencia.rows != 0){
+                    return response.json({data: 'Ya tiene asistencia :)'})
+                    // return respuesta
+                  }
+                  let asignatura = b[0].asignaturas[0].nombre
+                  const asistencia = new Asistencia()
+                  asistencia.rfid = rfids
+                  asistencia.matricula = b[0].matricula
+                  asistencia.alumno_id = b[0].id   
+                  asistencia.hora = currentTime
+                  asistencia.fecha = currentDate
+                  asistencia.asignatura = nombreAsignatura
+                  await asistencia.save()
+                  socket.emit('asistencia','ok')
+                  return response.status(200).json(asistencia) 
+                  // return respuesta
+                }
+                
+              }
+            })
+          });
+          // return respuesta                    
           
           // let asistencia = await Asistencia.create(request.all())
           // return response.created(asistencia)            
         }else{          
           socket.emit('rfid',rfids)
-          return response.status(404).json({data: 'rfid not exist'})
+          return response.status(404).json({data: 'Alumno no registrado, pasar a Registro de Alumno :)'})
           }
       }
       return validation.messages()       

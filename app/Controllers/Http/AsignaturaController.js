@@ -147,11 +147,13 @@ class AsignaturaController {
 
     let arrayId = await Database.table('horarios')
                                 .innerJoin('asignatura_horario', 'horarios.id', 'asignatura_horario.horario_id')
-    
+ 
     arrayId.forEach(async element => {
-      let id = await element['horario_id']
-      let del = await Horario.find(id)
-      await del.delete()
+      if(request.all()['id']==element['asignatura_id']){
+        let id = await element['horario_id']
+        let del = await Horario.find(id)
+        await del.delete()
+      }
     });
 
     let asignatura = await Asignatura.findOrFail(params.id)
