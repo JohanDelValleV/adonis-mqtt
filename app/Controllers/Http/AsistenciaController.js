@@ -55,14 +55,13 @@ class AsistenciaController {
   async store ({ request, response }) {      
       const validation = await validate(request.all(), rules)
       const rfids = request._body.rfid
-      //me  la pelas :v
       const moment = require('moment')      
       let currentDate = moment().format('YYYY-MM-DD')
       let currentTime = moment().format('hh:mm:ss')            
       if (!validation.fails()){
-        let alumno = await Alumno.query(). where('rfid', '=', rfids).fetch()         
-        const b =  JSON.parse(JSON.stringify(alumno));         
-        //let asignatura = Asignatura.query().with('horario').where('horaio.dia', '=', 'lunes').andWhere();
+        let alumno = await Alumno.query(). where('rfid', '=', rfids).with('asignaturas').fetch()         
+        const b =  JSON.parse(JSON.stringify(alumno));
+        let asignatura = b[0].asignaturas[0].nombre
         if(alumno.rows != 0){
           let diaAsistencia = await Asistencia.query().where('fecha', '=', currentDate).andWhere('rfid', rfids).fetch()
           if(diaAsistencia.rows != 0){
@@ -74,7 +73,7 @@ class AsistenciaController {
           asistencia.alumno_id = b[0].id   
           asistencia.hora = currentTime
           asistencia.fecha = currentDate
-          asistencia.asignatura = 'matematicas discretas'
+          asistencia.asignatura = asignatura
           await asistencia.save()
           return response.status(201).json(asistencia)                          
           
