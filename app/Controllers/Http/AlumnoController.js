@@ -1,8 +1,8 @@
 'use strict'
 const Alumno = use('App/Models/Alumno');
 const { validate } = use('Validator');
-// const io = require('socket.io-client');
-// const socket = io('http://localhost:3000')
+const io = require('socket.io-client');
+const socket = io('http://localhost:3000')
 const rules = {
   nombre: 'required',
   apellidoPaterno: 'required',
@@ -84,7 +84,6 @@ class AlumnoController {
     let {id} = params
     let alumno = await Alumno.query().with('asignaturas.horarios').with('asignaturas.profesor').where('id', '=', id).fetch()
     if (alumno.rows == 0) {
-      socket.emit('rfid',id)
       return response.status(404).json({data: 'Resource not found'})
     }
     return response.ok(alumno)

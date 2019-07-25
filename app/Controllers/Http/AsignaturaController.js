@@ -1,5 +1,13 @@
 'use strict'
 const Asignatura = use('App/Models/Asignatura');
+const Horario = use('App/Models/Horario');
+const Database = use('Database')
+const rules2 = {
+  dia: 'required',
+  hora_inicio: 'required',
+  hora_fin: 'required',
+};
+
 const { validate } = use('Validator');
 const rules = {
   nombre: 'required',
@@ -54,7 +62,22 @@ class AsignaturaController {
       return validation.messages()
     }
 
-    let {horarios, ...data} = await request.all(['horarios'])
+    let arrayHorarios = await request.all()['horarios'];
+    let idsHorario = []
+
+    arrayHorarios.forEach(async element => {
+      let as = await Horario.create(element)
+      idsHorario.push(as.id)
+    });
+
+    let form={
+      nombre:request.all()['nombre'],
+      slug:request.all()['slug'],
+      horarios:idsHorario
+    }
+
+
+    let {horarios, ...data} = await form
     let asignatura = await Asignatura.create(data)
 
     if (horarios && horarios.length > 0) {
@@ -103,12 +126,37 @@ class AsignaturaController {
    * @param {Response} ctx.response
    */
   async update ({ params, request, response }) {
-    let asignatura = await Asignatura.findOrFail(params.id)
-    let {horarios, ...data} = request.all(['horarios'])
     const validation = await validate(request.all(), rules)
     if (validation.fails()) {
       return validation.messages()
     }
+
+    let arrayHorarios = await request.all()['horarios'];
+    let idsHorario = []
+
+    arrayHorarios.forEach(async element => {
+      let as = await Horario.create(element)
+      idsHorario.push(as.id)
+    });
+
+    let form={
+      nombre:request.all()['nombre'],
+      slug:request.all()['slug'],
+      horarios:idsHorario
+    }
+
+    let arrayId = await Database.table('horarios')
+                                .innerJoin('asignatura_horario', 'horarios.id', 'asignatura_horario.horario_id')
+    
+    arrayId.forEach(async element => {
+      let id = await element['horario_id']
+      let del = await Horario.find(id)
+      await del.delete()
+    });
+
+    let asignatura = await Asignatura.findOrFail(params.id)
+    let {horarios, ...data} = await form
+    
     asignatura.merge(data)
     await asignatura.save()
 
