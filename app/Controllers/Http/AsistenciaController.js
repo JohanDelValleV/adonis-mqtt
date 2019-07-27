@@ -3,6 +3,7 @@ const Asistencia = use('App/Models/Asistencia');
 const Alumno = use('App/Models/Alumno');
 const Asignatura = use('App/Models/Alumno')
 const { validate } = use('Validator');
+const translate = use('translate')
 const io = require('socket.io-client');
 const socket = io('http://localhost:3000')
 const rules = {
@@ -57,52 +58,57 @@ class AsistenciaController {
       const rfids = request._body.rfid
       const moment = require('moment')      
       let currentDate = moment().format('YYYY-MM-DD')
-      let currentTime = moment().format('hh:mm:ss')            
+      let currentTime = moment().format('hh:mm:ss')    
+      let dia = moment().format('dddd')
+
+      const today = await translate(dia, { to: 'es', engine: 'yandex', key: 'trnsl.1.1.20190726T070849Z.676b74441a771aa6.2f2daaaeb82b7f6c924db80b13328082af033e1c' });      
+      console.log('hora actual:  ' + moment().format('hh')+' dia actual: ' + today);
       if (!validation.fails()){
         let alumno = await Alumno.query(). where('rfid', '=', rfids).with('asignaturas').fetch()         
         const b =  JSON.parse(JSON.stringify(alumno));
-        
-        var respuesta
+                
         
         if(alumno.rows != 0){
-          let date = new Date()
-          let today = date.getDay()
+          // let date = new Date()
+          // let today = date.getDay()
           let nombreToday = ''
           let alumno2 = await Alumno.query().with('asignaturas.horarios').with('asignaturas.profesor').where('id', '=', b[0].id).fetch()
           let alumnoJSON = JSON.parse(JSON.stringify(alumno2))
           alumnoJSON[0].asignaturas.forEach(async asignatura => {
             var nombreAsignatura = asignatura.nombre
             asignatura.horarios.forEach(async horario=>{
-              switch (today) {
-                case 1:
-                    nombreToday='Lunes'
-                break;
-                case 2:
-                    nombreToday='Martes'
-                break;
-                case 3:
-                    nombreToday='Miercoles'
-                break;
-                case 4:
-                    nombreToday='Jueves'
-                break;
-                case 5:
-                    nombreToday='Viernes'
-                break;
-                default:
-                  break;
-              }
-              if(horario.dia==nombreToday){
+              // switch (today) {
+              //   case 1:
+              //       nombreToday='Lunes'
+              //   break;
+              //   case 2:
+              //       nombreToday='Martes'
+              //   break;
+              //   case 3:
+              //       nombreToday='Miercoles'
+              //   break;
+              //   case 4:
+              //       nombreToday='Jueves'
+              //   break;
+              //   case 5:
+              //       nombreToday='Viernes'
+              //   break;
+              //   default:
+              //     break;
+              // }
+              if(horario.dia==today){
                 let inicio = parseInt(horario.hora_inicio.substring(0, 2))
                 let final = parseInt(horario.hora_fin.substring(0, 2))
-                let horaActual = date.getHours()
+                let horaActual = moment().format('hh') //date.getHours()
+                
+                
                 if(horaActual>=inicio && horaActual<final-1){
                   let diaAsistencia = await Asistencia.query().where('fecha', '=', currentDate).andWhere('rfid', rfids).andWhere('asignatura', nombreAsignatura).fetch()
                   if(diaAsistencia.rows != 0){
-                    return response.json({data: 'Ya tiene asistencia :)'})
-                    // return respuesta
-                  }
-                  let asignatura = b[0].asignaturas[0].nombre
+                  return response.json({data: 'Ya tiene asistencia :)'})           
+                  
+                           
+                  }                  
                   const asistencia = new Asistencia()
                   asistencia.rfid = rfids
                   asistencia.matricula = b[0].matricula
@@ -111,15 +117,13 @@ class AsistenciaController {
                   asistencia.fecha = currentDate
                   asistencia.asignatura = nombreAsignatura
                   await asistencia.save()
-                  socket.emit('asistencia','ok')
-                  return response.status(200).json(asistencia) 
-                  // return respuesta
+                  socket.emit('asistencia','ok')                                    
+                  return response.status(200).json(asistencia)                 
                 }
                 
               }
             })
-          });
-          // return respuesta                    
+          });          
           
           // let asistencia = await Asistencia.create(request.all())
           // return response.created(asistencia)            
